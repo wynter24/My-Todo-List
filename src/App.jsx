@@ -1,5 +1,7 @@
 import { useState } from "react";
 import "./App.css";
+import WorkingPoster from './components/WorkingPoster';
+import DonePoster from './components/DonePoster';
 
 function App() {
   // working에 저장되는 post 데이터
@@ -49,57 +51,6 @@ function App() {
     setContent("");
   };
 
-  // working 게시글 삭제
-  const RemoveWorkingdButton = (id) => {
-    const newPost = workingPosts.filter((post) => post.id !== id);
-    setWorkingPost(newPost);
-  };
-  // done 게시글 삭제
-  const RemoveDoneButton = (id) => {
-    const newDonePost = donePosts.filter((post) => post.id !== id);
-    setDonePost(newDonePost);
-  };
-
-  // working 완료 버튼: false->true => done zone을 이동
-  const WorkingDone = (id, title, body, item) => {
-    if (item.id === id) {
-      item.isDone = true;
-    }
-    // 완료 버튼 누른 post를 done에 추가
-    const donePost = {
-      id: donePosts.length + 1,
-      title,
-      body,
-      isDone: true,
-    };
-    setDonePost([...donePosts, donePost]);
-    // working에서 없어짐
-    const workingDonePost = workingPosts.filter(
-      (post) => post.isDone === false
-    );
-    setWorkingPost(workingDonePost);
-    alert(id);
-  };
-
-  // (done zone) 취소 버튼 눌렀을 때 working 존으로 다시 back
-  const NotYet = (id, title, body, item) => {
-    if (item.id === id) {
-      item.isDone = false;
-    }
-    // 취소 버튼 누른 post를 working에 추가
-    const notDonePost = {
-      id: workingPosts.length + 1,
-      title,
-      body,
-      isDone: false,
-    };
-    setWorkingPost([...workingPosts, notDonePost]);
-    // working에서 없어짐
-    const notYetPost = donePosts.filter((post) => post.isDone === true);
-    setDonePost(notYetPost);
-    alert(id);
-  };
-
   return (
     <div className="App">
       {/* 제일 고정 상단 헤더 */}
@@ -125,9 +76,11 @@ function App() {
             return (
               <WorkingPoster
                 key={item.id}
+                workingPosts={workingPosts}
+                setWorkingPost={setWorkingPost}
                 item={item}
-                RemoveWorkingdButton={RemoveWorkingdButton}
-                WorkingDone={WorkingDone}
+                donePosts={donePosts}
+                setDonePost={setDonePost}
               />
             );
           })}
@@ -138,11 +91,13 @@ function App() {
         <div className="post-box-layout">
           {donePosts.map(function (item) {
             return (
-              <DonePoster 
+              <DonePoster
                 key={item.id}
                 item={item}
-                RemoveDoneButton={RemoveDoneButton}
-                NotYet={NotYet}
+                donePosts={donePosts}
+                setDonePost={setDonePost}
+                workingPosts={workingPosts}
+                setWorkingPost={setWorkingPost}
               />
             );
           })}
@@ -151,55 +106,5 @@ function App() {
     </div>
   );
 }
-
-const WorkingPoster = ({ item, RemoveWorkingdButton, WorkingDone }) => {
-  return (
-    <div className="posted-box">
-      <div className="constent">
-        <p>{item.title}</p>
-        <p>{item.body}</p>
-      </div>
-      <div key={item.id} className="btn">
-        <button
-          onClick={() => RemoveWorkingdButton(item.id)}
-          className="delete-btn"
-        >
-          삭제하기
-        </button>
-        <button
-          onClick={() => WorkingDone(item.id, item.title, item.body, item)}
-          className="done-btn"
-        >
-          완료
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const DonePoster = ({item, RemoveDoneButton,NotYet}) => {
-  return (
-    <div className="posted-box">
-      <div className="constent">
-        <p>{item.title}</p>
-        <p>{item.body}</p>
-      </div>
-      <div key={item.id} className="btn">
-        <button
-          onClick={() => RemoveDoneButton(item.id)}
-          className="delete-btn"
-        >
-          삭제하기
-        </button>
-        <button
-          onClick={() => NotYet(item.id, item.title, item.body, item)}
-          className="done-btn"
-        >
-          취소
-        </button>
-      </div>
-    </div>
-  );
-};
 
 export default App;
